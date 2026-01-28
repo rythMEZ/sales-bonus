@@ -87,7 +87,8 @@ function analyzeSalesData(data, options) {
   data.purchase_records.forEach((record) => {
     const seller = sellerIndex[record.seller_id];
     seller.sales_count += 1;
-    // @TODO: Увеличить общую сумму выручки всех продаж
+
+    if (!record.items || record.items.length === 0) return;
 
     record.items.forEach((item) => {
       const product = productIndex[item.sku];
@@ -118,7 +119,7 @@ function analyzeSalesData(data, options) {
   // Подготовка итоговой коллекции с нужными полями
   return sellerStats.map((seller) => ({
     seller_id: seller.id,
-    name: seller.name + seller.last_name,
+    name: seller.name,
     revenue: +seller.revenue.toFixed(2),
     profit: +seller.profit.toFixed(2),
     sales_count: seller.sales_count,
