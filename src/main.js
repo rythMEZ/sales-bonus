@@ -12,7 +12,7 @@ function calculateSimpleRevenue(purchase, _product) {
   const revue = sale_price * quantity * (1 - discount / 100); // считаем выручку
   // const costPrice = _product.purchase_price * quantity; // считаем себестоимость
 
-  return revue;
+  return +revue.toFixed(2);
 }
 
 /**
@@ -49,7 +49,9 @@ function analyzeSalesData(data, options) {
     !Array.isArray(data.products) ||
     !Array.isArray(data.purchase_records) ||
     !Array.isArray(data.customers) ||
-    data.sellers.length === 0
+    data.sellers.length === 0 ||
+    data.products.length === 0 ||
+    data.purchase_records.length === 0
   ) {
     throw new Error("Некорректные входные данные!");
   }
