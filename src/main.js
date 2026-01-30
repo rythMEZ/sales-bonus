@@ -12,7 +12,7 @@ function calculateSimpleRevenue(purchase, _product) {
   const revue = sale_price * quantity * (1 - discount / 100); // считаем выручку
   // const costPrice = _product.purchase_price * quantity; // считаем себестоимость
 
-  return +revue.toFixed(2);
+  return revue;
 }
 
 /**
@@ -96,6 +96,7 @@ function analyzeSalesData(data, options) {
   data.purchase_records.forEach((record) => {
     const seller = sellerIndex[record.seller_id];
     seller.sales_count += 1;
+    seller.revenue += record.total_amount;
 
     if (!record.items || record.items.length === 0) return;
 
@@ -104,8 +105,7 @@ function analyzeSalesData(data, options) {
       const costPrice = product.purchase_price * item.quantity;
       const revenue = calculateRevenue(item);
       const profit = revenue - costPrice;
-      seller.profit += profit;
-      seller.revenue += revenue;
+      seller.profit = seller.profit + profit;
 
       if (!seller.products_sold[item.sku]) {
         seller.products_sold[item.sku] = item.quantity;
@@ -120,7 +120,11 @@ function analyzeSalesData(data, options) {
 
   // Назначение премий на основе ранжирования
   sellerStats.forEach((seller, index) => {
-    seller.bonus = calculateBonusByProfit(index, sellerStats.length, seller);
+    seller.bonus = +calculateBonusByProfit(
+      index,
+      sellerStats.length,
+      seller,
+    ).toFixed(2);
     seller.top_products = Object.entries(seller.products_sold)
       .map(([sku, quantity]) => ({ sku, quantity }))
       .sort((a, b) => b.quantity - a.quantity)
